@@ -1,10 +1,20 @@
 Username: Kalo
 Password: 123
-Age: 19
+Age: 18
 Gender: m
-Height: 180 cm
-Weight: 65 kg
-Activity Level: moderate
+Height: 187 cm
+Weight: 78 kg
+Activity Level: low
+Goal: cutting
+Account Type: Premium
+-----------------------------
+Username: Ivan
+Password: 123
+Age: 17
+Gender: m
+Height: 167 cm
+Weight: 67 kg
+Activity Level: low
 Goal: cutting
 Account Type: Premium
 -----------------------------
