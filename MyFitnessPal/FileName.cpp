@@ -48,20 +48,22 @@ vector<Meal> extractMealsForDate(const string& username, const string& date)
     string filename = username + "_meals.txt";
     ifstream file(filename);
     if (!file.is_open()) return meals;
-
     string line;
     bool isDateMatch = false;
     Meal meal;
-
-    while (getline(file, line)) {
-        if (line.find("Date: ") != string::npos) {
+    while (getline(file, line)) 
+    {
+        if (line.find("Date: ") != string::npos) 
+        {
             isDateMatch = (line.substr(6) == date);
         }
         if (isDateMatch) {
-            if (line.find("Food: ") != string::npos) {
+            if (line.find("Food: ") != string::npos) 
+            {
                 meal.food = line.substr(6);
             }
-            else if (line.find("Calories: ") != string::npos) {
+            else if (line.find("Calories: ") != string::npos) 
+            {
                 meal.calories = stof(line.substr(10));
                 meal.date = date;
                 meals.push_back(meal);
@@ -76,20 +78,23 @@ vector<Training> extractTrainingForDate(const string& username, const string& da
     string filename = username + "_training.txt";
     ifstream file(filename);
     if (!file.is_open()) return trainings;
-
     string line;
     bool isDateMatch = false;
     Training training;
-
-    while (getline(file, line)) {
-        if (line.find("Date: ") != string::npos) {
+    while (getline(file, line)) 
+    {
+        if (line.find("Date: ") != string::npos) 
+        {
             isDateMatch = (line.substr(6) == date);
         }
-        if (isDateMatch) {
-            if (line.find("Type: ") != string::npos) {
+        if (isDateMatch) 
+        {
+            if (line.find("Type: ") != string::npos) 
+            {
                 training.type = line.substr(6);
             }
-            else if (line.find("Calories: ") != string::npos) {
+            else if (line.find("Calories: ") != string::npos) 
+            {
                 training.calories = stof(line.substr(10));
                 training.date = date;
                 trainings.push_back(training);
@@ -103,7 +108,8 @@ vector<Training> extractTrainingForDate(const string& username, const string& da
 void saveMealsToFile(const string& username, const vector<Meal>& meals) {
     string filename = username + "_meals.txt";
     ofstream file(filename, ios::trunc);
-    for (const auto& meal : meals) {
+    for (const auto& meal : meals) 
+    {
         file << "Date: " << meal.date << endl;
         file << "Food: " << meal.food << endl;
         file << "Calories: " << meal.calories << endl;
@@ -114,7 +120,8 @@ void saveMealsToFile(const string& username, const vector<Meal>& meals) {
 void saveTrainingToFile(const string& username, const vector<Training>& trainings) {
     string filename = username + "_training.txt";
     ofstream file(filename, ios::trunc);
-    for (const auto& training : trainings) {
+    for (const auto& training : trainings) 
+    {
         file << "Date: " << training.date << endl;
         file << "Type: " << training.type << endl;
         file << "Calories: " << training.calories << endl;
@@ -126,16 +133,12 @@ void addMeal(const string& username)
 {
     Meal meal;
     cout << "--- Add a meal: ---\n";
-
     meal.date = getCurrentDate();
-
     cout << "Name of the food: ";
     cin.ignore();
     getline(cin, meal.food);
-
     cout << "Calories: ";
     cin >> meal.calories;
-
     ofstream file(username + "_meals.txt", ios::app);
     if (file.is_open()) 
     {
@@ -147,19 +150,18 @@ void addMeal(const string& username)
         file.close();
         cout << "Meal was added!\n";
     }
-    else {
+    else 
+    {
         cout << "Error opening the file!\n";
     }
 }
 
 void editMeals(const string& username, const string& date) {
     vector<Meal> meals = extractMealsForDate(username, date);
-
     cout << "\n--- Meals for " << date << " ---\n";
     for (size_t i = 0; i < meals.size(); i++) {
         cout << i + 1 << ". Food: " << meals[i].food << ", Calories: " << meals[i].calories << endl;
     }
-
     int choice;
     cout << "\nSelect a meal to edit: ";
     cin >> choice;
@@ -178,19 +180,16 @@ void editMeals(const string& username, const string& date) {
         cout << "Invalid choice!\n";
         return;
     }
-
     saveMealsToFile(username, meals);
     cout << "Meals updated successfully!\n";
 }
 
 void editTraining(const string& username, const string& date) {
     vector<Training> trainings = extractTrainingForDate(username, date);
-
     for (size_t i = 0; i < trainings.size(); i++) 
     {
         cout << i + 1 << ". Type: " << trainings[i].type << ", Calories: " << trainings[i].calories << endl;
     }
-
     int choice;
     cout << "\nSelect a training to edit: ";
     cin >> choice;
@@ -209,7 +208,6 @@ void editTraining(const string& username, const string& date) {
         cout << "Invalid choice!\n";
         return;
     }
-
     saveTrainingToFile(username, trainings);
     cout << "Trainings updated successfully!\n";
 }
@@ -218,16 +216,12 @@ void addTraining(const string& username)
 {
     Training training;
     cout << "--- Add a training: ---\n";
-
     training.date = getCurrentDate();
-
     cout << "Type of training: ";
     cin.ignore();
     getline(cin, training.type);
-
     cout << "Calories: ";
     cin >> training.calories;
-
     ofstream file(username + "_training.txt", ios::app);
     if (file.is_open())
     {
@@ -317,10 +311,7 @@ bool isUsernameFree(string username)
 void registerUser() 
 {
     User user;
-
     cout << "=== Registration: ===" << endl;
-
-    // Check if username is unique:
     do 
     {
         cout << "Enter username: ";
@@ -330,28 +321,20 @@ void registerUser()
             cout << "Username not free." << endl;
         }
     } while (!isUsernameFree(user.username));
-
     cout << "Enter password: ";
     cin >> user.password;
-
     cout << "Enter age: ";
     cin >> user.age;
-
     cout << "Enter gender (m/f): ";
     cin >> user.gender;
-
     cout << "Enter height (cm): ";
     cin >> user.height;
-
     cout << "Enter weight (kg): ";
     cin >> user.weight;
-
     cout << "Enter activity level (low/moderate/high/very high): ";
     cin >> user.activityLevel;
-
     cout << "Enter goal (cutting/maintaining/gaining): ";
     cin >> user.goal;
-
     do 
     {
         cout << "Enter account type (Standard/Premium): ";
@@ -361,9 +344,7 @@ void registerUser()
             cout << "Error, enter 'Standard' or 'Premium'." << endl;
         }
     } while (user.accountType != "Standard" || user.accountType != "Premium");
-
-    // Write user data to users.txt
-    ofstream file("users.txt", ios::app);  // Open users.txt
+    ofstream file("users.txt", ios::app);
     if (file.is_open()) 
     {
         file << "Username: " << user.username << endl;
@@ -388,47 +369,34 @@ void loginUser()
 {
     string username, password;
     cout << "\n--- User Login ---\n";
-
     cout << "Enter username: ";
-    cin >> username;
-
+    cin >> username; 
     cout << "Enter password: ";
     cin >> password;
-
-    ifstream file("users.txt");  // Open the file to read user data
+    ifstream file("users.txt");
     string line;
-    bool found = false;  // Flag to check if we found the user
+    bool found = false;
     string storedUsername, storedPassword;
-
-    // Read the file line by line
     while (getline(file, line)) 
     {
-        // Look for the username line
         if (line.find("Username: " + username) != string::npos) 
         {
-            storedUsername = username;  // Set stored username to the one from input
-
-            // Read the next line for the password
-            getline(file, line);  // Read password line
-            storedPassword = line.substr(line.find(": ") + 2);  // Extract password part
-
-            // Check if the password matches
+            storedUsername = username;
+            getline(file, line);
+            storedPassword = line.substr(line.find(": ") + 2); 
             if (storedPassword == password) 
             {
-                currentLoggedInUser = username;  // Set the current logged-in user
+                currentLoggedInUser = username;
                 cout << "Login successful! Welcome, " << username << "!\n";
-                found = true;  // Mark that the user was found and logged in
+                found = true;
                 break;
             }
         }
     }
-
-    // If no matching username or password is found
     if (!found) 
     {
         cout << "Invalid username or password!\n";
     }
-
     file.close();
 }
 unsigned recommendedCalories(const User& user)
@@ -501,7 +469,8 @@ float caloricBalance(const string& username, const string& date)
     file.close();
     string trainingFile = username + "_training.txt";
     ifstream trainingInputFile(trainingFile);
-    if (!trainingInputFile.is_open()) {
+    if (!trainingInputFile.is_open()) 
+    {
         cout << "Error: Could not open file " << trainingFile << "!" << endl;
         return -1;
     }
@@ -536,25 +505,27 @@ void calculateMacros(const User& user)
 {
     cout << "--- Macronutrient Distribution ---\n";
     float totalCalories = recommendedCalories(user);
-
     float proteinPercentage = 0.0, fatPercentage = 0.0, carbPercentage = 0.0;
-
-    if (user.goal == "cutting") {
+    if (user.goal == "cutting") 
+    {
         proteinPercentage = 0.35;
         fatPercentage = 0.30;
         carbPercentage = 0.35;
     }
-    else if (user.goal == "maintaining") {
+    else if (user.goal == "maintaining") 
+    {
         proteinPercentage = 0.25;
         fatPercentage = 0.30;
         carbPercentage = 0.45;
     }
-    else if (user.goal == "gaining") {
+    else if (user.goal == "gaining") 
+    {
         proteinPercentage = 0.20;
         fatPercentage = 0.25;
         carbPercentage = 0.55;
     }
-    else {
+    else 
+    {
         cout << "Invalid goal.\n";
         return;
     }
