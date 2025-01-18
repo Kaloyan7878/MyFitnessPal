@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+#include <vector>
 using namespace std;
 
 struct User
@@ -41,7 +42,86 @@ string getCurrentDate()
     strftime(currentDate, sizeof(currentDate), "%Y-%m-%d", &localTime);
     return string(currentDate);
 }
-//Function that creates a file which stores he data about he meals of the user on different dates
+vector<Meal> extractMealsForDate(const string& username, const string& date) 
+{
+    vector<Meal> meals;
+    string filename = username + "_meals.txt";
+    ifstream file(filename);
+    if (!file.is_open()) return meals;
+
+    string line;
+    bool isDateMatch = false;
+    Meal meal;
+
+    while (getline(file, line)) {
+        if (line.find("Date: ") != string::npos) {
+            isDateMatch = (line.substr(6) == date);
+        }
+        if (isDateMatch) {
+            if (line.find("Food: ") != string::npos) {
+                meal.food = line.substr(6);
+            }
+            else if (line.find("Calories: ") != string::npos) {
+                meal.calories = stof(line.substr(10));
+                meal.date = date;
+                meals.push_back(meal);
+            }
+        }
+    }
+    file.close();
+    return meals;
+}
+vector<Training> extractTrainingForDate(const string& username, const string& date) {
+    vector<Training> trainings;
+    string filename = username + "_training.txt";
+    ifstream file(filename);
+    if (!file.is_open()) return trainings;
+
+    string line;
+    bool isDateMatch = false;
+    Training training;
+
+    while (getline(file, line)) {
+        if (line.find("Date: ") != string::npos) {
+            isDateMatch = (line.substr(6) == date);
+        }
+        if (isDateMatch) {
+            if (line.find("Type: ") != string::npos) {
+                training.type = line.substr(6);
+            }
+            else if (line.find("Calories: ") != string::npos) {
+                training.calories = stof(line.substr(10));
+                training.date = date;
+                trainings.push_back(training);
+            }
+        }
+    }
+    file.close();
+    return trainings;
+}
+
+void saveMealsToFile(const string& username, const vector<Meal>& meals) {
+    string filename = username + "_meals.txt";
+    ofstream file(filename, ios::trunc);
+    for (const auto& meal : meals) {
+        file << "Date: " << meal.date << endl;
+        file << "Food: " << meal.food << endl;
+        file << "Calories: " << meal.calories << endl;
+    }
+    file.close();
+}
+
+void saveTrainingToFile(const string& username, const vector<Training>& trainings) {
+    string filename = username + "_training.txt";
+    ofstream file(filename, ios::trunc);
+    for (const auto& training : trainings) {
+        file << "Date: " << training.date << endl;
+        file << "Type: " << training.type << endl;
+        file << "Calories: " << training.calories << endl;
+    }
+    file.close();
+}
+
 void addMeal(const string& username) 
 {
     Meal meal;
@@ -70,6 +150,69 @@ void addMeal(const string& username)
     else {
         cout << "Error opening the file!\n";
     }
+}
+
+void editMeals(const string& username, const string& date) {
+    vector<Meal> meals = extractMealsForDate(username, date);
+
+    cout << "\n--- Meals for " << date << " ---\n";
+    for (size_t i = 0; i < meals.size(); i++) {
+        cout << i + 1 << ". Food: " << meals[i].food << ", Calories: " << meals[i].calories << endl;
+    }
+
+    int choice;
+    cout << "\nSelect a meal to edit (or 0 to add a new meal): ";
+    cin >> choice;
+    if (choice > 0 && choice <= meals.size()) 
+    {
+        Meal& meal = meals[choice - 1];
+        cout << "Editing meal: " << meal.food << ", " << meal.calories << " calories\n";
+        cout << "Enter new food: ";
+        cin.ignore();
+        getline(cin, meal.food);
+        cout << "Enter new calories: ";
+        cin >> meal.calories;
+    }
+    else 
+    {
+        cout << "Invalid choice!\n";
+        return;
+    }
+
+    saveMealsToFile(username, meals);
+    cout << "Meals updated successfully!\n";
+}
+
+void editTraining(const string& username, const string& date) {
+    vector<Training> trainings = extractTrainingForDate(username, date);
+
+    cout << "\n--- Trainings for " << date << " ---\n";
+    for (size_t i = 0; i < trainings.size(); i++) 
+    {
+        cout << i + 1 << ". Type: " << trainings[i].type << ", Calories: " << trainings[i].calories << endl;
+    }
+
+    int choice;
+    cout << "\nSelect a training to edit (or 0 to add a new training): ";
+    cin >> choice;
+    if (choice > 0 && choice <= trainings.size()) 
+    {
+        Training& training = trainings[choice - 1];
+        cout << "Editing training: " << training.type << ", " << training.calories << " calories\n";
+        cout << "Enter new training type: ";
+        cin.ignore();
+        getline(cin, training.type);
+        cout << "Enter new calories burned: ";
+        cin >> training.calories;
+    }
+    else 
+    {
+        cout << "Invalid choice!\n";
+        return;
+    }
+
+    saveTrainingToFile(username, trainings);
+    cout << "Trainings updated successfully!\n";
 }
 
 void addTraining(const string& username)
@@ -490,7 +633,9 @@ int main()
             cout << "\n--- User Menu ---\n";
             cout << "1. Add meal\n";
             cout << "2. Add training session\n";
-            cout << "3. Logout\n";
+            cout << "3.Edit today's meals\n";
+            cout << "4.Edit today's training sessions\n";
+            cout << "5. Logout\n";
             cout << "Enter your choice: ";
             cin >> choice;
 
