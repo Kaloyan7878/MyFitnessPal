@@ -161,7 +161,7 @@ void editMeals(const string& username, const string& date) {
     }
 
     int choice;
-    cout << "\nSelect a meal to edit (or 0 to add a new meal): ";
+    cout << "\nSelect a meal to edit: ";
     cin >> choice;
     if (choice > 0 && choice <= meals.size()) 
     {
@@ -186,14 +186,13 @@ void editMeals(const string& username, const string& date) {
 void editTraining(const string& username, const string& date) {
     vector<Training> trainings = extractTrainingForDate(username, date);
 
-    cout << "\n--- Trainings for " << date << " ---\n";
     for (size_t i = 0; i < trainings.size(); i++) 
     {
         cout << i + 1 << ". Type: " << trainings[i].type << ", Calories: " << trainings[i].calories << endl;
     }
 
     int choice;
-    cout << "\nSelect a training to edit (or 0 to add a new training): ";
+    cout << "\nSelect a training to edit: ";
     cin >> choice;
     if (choice > 0 && choice <= trainings.size()) 
     {
@@ -282,7 +281,6 @@ User extractUserData(const string& username)
             break;  // Exit the loop once the user is found
         }
     }
-
     file.close();
     if (!found) 
     {
@@ -470,9 +468,9 @@ unsigned recommendedCalories(const User& user)
     else if (user.goal == "maintaining") return maintenanceCalories;
     else return maintenanceCalories + 550;
 }
-float caloricBalance(const string& username)
+float caloricBalance(const string& username, const string& date)
 {
-    string currentDate = getCurrentDate();
+    string currentDate = date;
     string filename = username + "_meals.txt";
     ifstream file(filename);
     if (!file.is_open())
@@ -591,8 +589,48 @@ void displayUserData(const string& username)
     // Calculate and display the recommended daily calories
     float recommendedCal = recommendedCalories(user);
     cout << "Recommended daily calories: " << recommendedCal << " kcal" << endl;
-    cout << "Balance: " << caloricBalance(username) << endl;
+    cout << "Balance: " << caloricBalance(username,getCurrentDate()) << endl;
     if (user.accountType == "Premium") calculateMacros(user);
+}
+void generateDailyReport(const string& username,const string& date)
+{
+    vector<Meal> meals = extractMealsForDate(username, date);
+    vector<Training> trainings = extractTrainingForDate(username, date);
+    float totalMealCalories = 0.0;
+    float totalTrainingCalories = 0.0;
+    cout << "--- Daily Report for " << date << " ---\n";
+    cout << "--- Daily Report for " << date << " ---\n";
+    cout << "\nMeals:\n";
+    if (meals.empty())
+    {
+        cout << "No meals recorded for today.\n";
+    }
+    else
+    {
+        for (int i = 0; i < meals.size(); i++) 
+        {
+            cout << "Meal " << (i + 1) << ": Food: " << meals[i].food << ", Calories: " << meals[i].calories << endl;
+            totalMealCalories += meals[i].calories;
+        }
+    }
+    cout << "\nTraining Sessions:\n";
+    if (trainings.empty())
+    {
+        cout << "No training recorded for today.\n";
+    }
+    else
+    {
+        for (int i = 0; i < trainings.size(); i++) 
+        {
+            cout << "Training " << (i + 1) << ": Type: " << trainings[i].type << ", Calories burned: " << trainings[i].calories << endl;
+            totalTrainingCalories += trainings[i].calories;
+        }
+    }
+    float caloricBalanceToday = caloricBalance(username,date);
+    cout << "\nCaloric Balance for " << date << ":\n";
+    cout << "Total Calories from Meals: " << totalMealCalories << " kcal\n";
+    cout << "Total Calories Burned in Training: " << totalTrainingCalories << " kcal\n";
+    cout << "Caloric Balance: " << caloricBalanceToday << " kcal\n";
 }
 
 int main()
@@ -615,6 +653,7 @@ int main()
         else if (choice == 2) 
         {
             loginUser();
+            displayUserData(currentLoggedInUser);
         }
         else if (choice == 3) 
         {
@@ -625,17 +664,17 @@ int main()
         {
             cout << "Invalid choice! Please try again.\n";
         }
-
         // If a user logs in, show the user menu
         while (!currentLoggedInUser.empty()) 
         {
-            displayUserData(currentLoggedInUser);
             cout << "\n--- User Menu ---\n";
             cout << "1. Add meal\n";
             cout << "2. Add training session\n";
-            cout << "3.Edit today's meals\n";
-            cout << "4.Edit today's training sessions\n";
-            cout << "5. Logout\n";
+            cout << "3. Edit today's meals\n";
+            cout << "4. Edit today's training sessions\n";
+            cout << "5. View report for previous dates\n";
+            cout << "6. View today's report\n";
+            cout << "7. Logout\n";
             cout << "Enter your choice: ";
             cin >> choice;
 
@@ -644,7 +683,26 @@ int main()
             {
                 addTraining(currentLoggedInUser);
             }
-            else if (choice == 3) 
+            else if (choice == 3)
+            {
+                editMeals(currentLoggedInUser, getCurrentDate());
+            }
+            else if (choice == 4)
+            {
+                editTraining(currentLoggedInUser, getCurrentDate());
+            }
+            else if (choice == 5)
+            {
+                cout << "Please type a date (YYYY-MM-DD Format):";
+                string date;
+                cin >> date;
+                generateDailyReport(currentLoggedInUser, date);
+            }
+            else if (choice == 6)
+            {
+                generateDailyReport(currentLoggedInUser, getCurrentDate());
+            }
+            else if (choice == 7) 
             {
                 cout << "Logging out...\n";
                 currentLoggedInUser = ""; // Clear the logged-in user

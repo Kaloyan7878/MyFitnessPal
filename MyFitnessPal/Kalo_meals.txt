@@ -1,14 +1,6 @@
-Username: Kalo
-Date: 2025-01-17
-Food: Steak
-Calories: 120
------------------------------
-Username: Kalo
 Date: 2025-01-18
-Food: Steak
-Calories: 140
------------------------------
+Food: Apple
+Calories: 30
 Date: 2025-01-18
 Food: Bread
 Calories: 140
------------------------------
