@@ -86,7 +86,7 @@ void addTraining(const string& username)
     cout << "Calories: ";
     cin >> training.calories;
 
-    ofstream file(username + "_meals.txt", ios::app);
+    ofstream file(username + "_training.txt", ios::app);
     if (file.is_open())
     {
         file << "Date: " << training.date << endl;
@@ -97,7 +97,8 @@ void addTraining(const string& username)
         file.close();
         cout << "Training was added!\n";
     }
-    else {
+    else 
+    {
         cout << "Error opening the file!\n";
     }
 }
@@ -326,8 +327,106 @@ unsigned recommendedCalories(const User& user)
     else if (user.goal == "maintaining") return maintenanceCalories;
     else return maintenanceCalories + 550;
 }
+float caloricBalance(const string& username)
+{
+    string currentDate = getCurrentDate();
+    string filename = username + "_meals.txt";
+    ifstream file(filename);
+    if (!file.is_open())
+    {
+        cout << "Error: Could not open file " << filename << "!" << endl;
+        return -1;
+    }
+    string line;
+    float totalCalories = 0.0;
+    bool foundTodayMeals = false;
+    while (getline(file, line))
+    {
+        if (line.find("Date: ") != string::npos) 
+        {
+            string date = line.substr(6);
+            if (date == currentDate) foundTodayMeals = true;
+            else foundTodayMeals = false;
+        }
+        if (foundTodayMeals) 
+        {
+            if (line.find("Calories: ") != string::npos) 
+            {
+                float calories = stof(line.substr(10));
+                totalCalories += calories;
+            }
+        }
+    }
+    file.close();
+    string trainingFile = username + "_training.txt";
+    ifstream trainingInputFile(trainingFile);
+    if (!trainingInputFile.is_open()) {
+        cout << "Error: Could not open file " << trainingFile << "!" << endl;
+        return -1;
+    }
+    float totalCaloriesBurned = 0.0;
+    bool foundTodayTrainings = false;
+    while (getline(trainingInputFile, line)) {
+        if (line.find("Date: ") != string::npos) 
+        {
+            string date = line.substr(6);
+            if (date == currentDate) 
+            {
+                foundTodayTrainings = true;
+            }
+            else 
+            {
+                foundTodayTrainings = false;
+            }
+        }
+        if (foundTodayTrainings) 
+        {
+            if (line.find("Calories: ") != string::npos) {
+                float caloriesBurned = stof(line.substr(10));
+                totalCaloriesBurned += caloriesBurned;
+            }
+        }
+    }
+    trainingInputFile.close();
+    return totalCalories - totalCaloriesBurned;
+}
+//Function that calculates macros for the premium users
+void calculateMacros(const User& user) 
+{
+    cout << "--- Macronutrient Distribution ---\n";
+    float totalCalories = recommendedCalories(user);
 
+    float proteinPercentage = 0.0, fatPercentage = 0.0, carbPercentage = 0.0;
 
+    if (user.goal == "cutting") {
+        proteinPercentage = 0.35;
+        fatPercentage = 0.30;
+        carbPercentage = 0.35;
+    }
+    else if (user.goal == "maintaining") {
+        proteinPercentage = 0.25;
+        fatPercentage = 0.30;
+        carbPercentage = 0.45;
+    }
+    else if (user.goal == "gaining") {
+        proteinPercentage = 0.20;
+        fatPercentage = 0.25;
+        carbPercentage = 0.55;
+    }
+    else {
+        cout << "Invalid goal.\n";
+        return;
+    }
+    float proteinCalories = totalCalories * proteinPercentage;
+    float fatCalories = totalCalories * fatPercentage;
+    float carbCalories = totalCalories * carbPercentage;
+    float proteinGrams = proteinCalories / 4;
+    float fatGrams = fatCalories / 9;
+    float carbGrams = carbCalories / 4;
+    cout << "Protein: " << proteinGrams << " grams\n";
+    cout << "Fat: " << fatGrams << " grams\n";
+    cout << "Carbohydrates: " << carbGrams << " grams\n";
+}
 
 // Function to display user data and recommended calories
 void displayUserData(const string& username) 
@@ -349,6 +448,8 @@ void displayUserData(const string& username)
     // Calculate and display the recommended daily calories
     float recommendedCal = recommendedCalories(user);
     cout << "Recommended daily calories: " << recommendedCal << " kcal" << endl;
+    cout << "Balance: " << caloricBalance(username) << endl;
+    if (user.accountType == "Premium") calculateMacros(user);
 }
 
 int main()
