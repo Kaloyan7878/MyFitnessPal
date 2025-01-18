@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ctime>
 using namespace std;
 
 struct User
@@ -9,11 +10,11 @@ struct User
     string password;
     unsigned age;
     string gender;
-    float height; // in cm
-    float weight; // in kg
-    string activityLevel; // low, medium, high
-    string goal; // lose, maintain, gain weight
-    string accountType; // Standard or Premium
+    float height;
+    float weight;
+    string activityLevel; 
+    string goal;
+    string accountType;
     float maintenanceCalories;
 };
 
@@ -24,12 +25,29 @@ struct Meal
     float calories;
 };
 
-void addMeal(const string& username) {
+struct Training
+{
+    string date;
+    string type;
+    float calories;
+};
+//Function that shos the current date in the corrent format
+string getCurrentDate()
+{
+    time_t now = time(0);
+    tm localTime;
+    localtime_s(&localTime, &now);
+    char currentDate[11];
+    strftime(currentDate, sizeof(currentDate), "%Y-%m-%d", &localTime);
+    return string(currentDate);
+}
+//Function that creates a file which stores he data about he meals of the user on different dates
+void addMeal(const string& username) 
+{
     Meal meal;
-    cout << "--- ???????? ?? ??????? ---\n";
+    cout << "--- Add a meal: ---\n";
 
-    cout << "Date (format: YYYY-MM-DD): ";
-    cin >> meal.date;
+    meal.date = getCurrentDate();
 
     cout << "Name of the food: ";
     cin.ignore();
@@ -39,8 +57,8 @@ void addMeal(const string& username) {
     cin >> meal.calories;
 
     ofstream file(username + "_meals.txt", ios::app);
-    if (file.is_open()) {
-        file << "Username: " << username << endl;
+    if (file.is_open()) 
+    {
         file << "Date: " << meal.date << endl;
         file << "Food: " << meal.food << endl;
         file << "Calories: " << meal.calories << endl;
@@ -54,23 +72,57 @@ void addMeal(const string& username) {
     }
 }
 
+void addTraining(const string& username)
+{
+    Training training;
+    cout << "--- Add a training: ---\n";
+
+    training.date = getCurrentDate();
+
+    cout << "Type of training: ";
+    cin.ignore();
+    getline(cin, training.type);
+
+    cout << "Calories: ";
+    cin >> training.calories;
+
+    ofstream file(username + "_meals.txt", ios::app);
+    if (file.is_open())
+    {
+        file << "Date: " << training.date << endl;
+        file << "Type: " << training.type << endl;
+        file << "Calories: " << training.calories << endl;
+        file << "-----------------------------" << endl;
+
+        file.close();
+        cout << "Training was added!\n";
+    }
+    else {
+        cout << "Error opening the file!\n";
+    }
+}
+
 User users[100];
 int userCount = 0;
 string currentLoggedInUser = "";
 
-User extractUserData(const string& username) {
+User extractUserData(const string& username) 
+{
     ifstream file("users.txt");
     string line;
     User user;
     bool found = false;
 
     // Read the file line by line to find the user's data
-    while (getline(file, line)) {
-        if (line.find("Username: " + username) != string::npos) {
+    while (getline(file, line)) 
+    {
+        if (line.find("Username: " + username) != string::npos) 
+        {
             user.username = username;
 
             // Extract remaining data from the file
-            for (int i = 0; i < 8; ++i) {
+            for (int i = 0; i < 8; ++i) 
+            {
                 getline(file, line);
                 if (i == 0) user.password = line.substr(line.find(": ") + 2);
                 if (i == 1) user.age = stoi(line.substr(line.find(": ") + 2));
@@ -88,7 +140,8 @@ User extractUserData(const string& username) {
     }
 
     file.close();
-    if (!found) {
+    if (!found) 
+    {
         cout << "User not found in the file!" << endl;
     }
 
@@ -119,16 +172,19 @@ bool isUsernameFree(string username)
     file.close();
     return true;
 }
-void registerUser() {
+void registerUser() 
+{
     User user;
 
     cout << "=== Registration: ===" << endl;
 
     // Check if username is unique:
-    do {
+    do 
+    {
         cout << "Enter username: ";
         cin >> user.username;
-        if (!isUsernameFree(user.username)) {
+        if (!isUsernameFree(user.username)) 
+        {
             cout << "Username not free." << endl;
         }
     } while (!isUsernameFree(user.username));
@@ -154,17 +210,20 @@ void registerUser() {
     cout << "Enter goal (cutting/maintaining/gaining): ";
     cin >> user.goal;
 
-    do {
+    do 
+    {
         cout << "Enter account type (Standard/Premium): ";
         cin >> user.accountType;
-        if (user.accountType != "Standard" && user.accountType != "Premium") {
+        if (user.accountType != "Standard" || user.accountType != "Premium") 
+        {
             cout << "Error, enter 'Standard' or 'Premium'." << endl;
         }
-    } while (user.accountType != "Standard" && user.accountType != "Premium");
+    } while (user.accountType != "Standard" || user.accountType != "Premium");
 
     // Write user data to users.txt
-    ofstream file("users.txt", ios::app);  // Open users.txt for appending
-    if (file.is_open()) {
+    ofstream file("users.txt", ios::app);  // Open users.txt
+    if (file.is_open()) 
+    {
         file << "Username: " << user.username << endl;
         file << "Password: " << user.password << endl;
         file << "Age: " << user.age << endl;
@@ -174,11 +233,12 @@ void registerUser() {
         file << "Activity Level: " << user.activityLevel << endl;
         file << "Goal: " << user.goal << endl;
         file << "Account Type: " << user.accountType << endl;
-        file << "-----------------------------" << endl;  // Separator between users
+        file << "-----------------------------" << endl;
         file.close();
         cout << "Registration is successful!" << endl;
     }
-    else {
+    else 
+    {
         cout << "Error writing user data!" << endl;
     }
 }
@@ -199,9 +259,11 @@ void loginUser()
     string storedUsername, storedPassword;
 
     // Read the file line by line
-    while (getline(file, line)) {
+    while (getline(file, line)) 
+    {
         // Look for the username line
-        if (line.find("Username: " + username) != string::npos) {
+        if (line.find("Username: " + username) != string::npos) 
+        {
             storedUsername = username;  // Set stored username to the one from input
 
             // Read the next line for the password
@@ -209,7 +271,8 @@ void loginUser()
             storedPassword = line.substr(line.find(": ") + 2);  // Extract password part
 
             // Check if the password matches
-            if (storedPassword == password) {
+            if (storedPassword == password) 
+            {
                 currentLoggedInUser = username;  // Set the current logged-in user
                 cout << "Login successful! Welcome, " << username << "!\n";
                 found = true;  // Mark that the user was found and logged in
@@ -219,11 +282,12 @@ void loginUser()
     }
 
     // If no matching username or password is found
-    if (!found) {
+    if (!found) 
+    {
         cout << "Invalid username or password!\n";
     }
 
-    file.close();  // Close the file after reading
+    file.close();
 }
 unsigned recommendedCalories(const User& user)
 {
@@ -249,7 +313,7 @@ unsigned recommendedCalories(const User& user)
     {
         activityCoefficient = 1.725; // Active work (6-7 days per week)
     }
-    else if (user.activityLevel == "very_active")
+    else if (user.activityLevel == "very active")
     {
         activityCoefficient = 1.9; // Very active (intense physical activity)
     }
@@ -263,10 +327,14 @@ unsigned recommendedCalories(const User& user)
     else return maintenanceCalories + 550;
 }
 
+
+
 // Function to display user data and recommended calories
-void displayUserData(const string& username) {
+void displayUserData(const string& username) 
+{
     User user = extractUserData(username);  // Get user data from file
-    if (user.username.empty()) {
+    if (user.username.empty()) 
+    {
         return;  // If the username was not found, exit the function
     }
     cout << "\n--- User Data ---\n";
@@ -287,7 +355,8 @@ int main()
 {
     string username, password;
     unsigned choice;
-    do {
+    do 
+    {
         cout << "\n--- Main Menu ---\n";
         cout << "1. Register\n";
         cout << "2. Login\n";
@@ -295,17 +364,21 @@ int main()
         cout << "Enter your choice: ";
         cin >> choice;
 
-        if (choice == 1) {
+        if (choice == 1) 
+        {
             registerUser();
         }
-        else if (choice == 2) {
+        else if (choice == 2) 
+        {
             loginUser();
         }
-        else if (choice == 3) {
+        else if (choice == 3) 
+        {
             cout << "Exiting the program. Goodbye!\n";
             return 0;
         }
-        else {
+        else 
+        {
             cout << "Invalid choice! Please try again.\n";
         }
 
@@ -320,15 +393,18 @@ int main()
             cout << "Enter your choice: ";
             cin >> choice;
 
-            if (choice == 1) addMeal(username);
-            if (choice == 2) {
-                cout << "Training session feature coming soon!\n"; // Placeholder
+            if (choice == 1) addMeal(currentLoggedInUser);
+            else if (choice == 2) 
+            {
+                addTraining(currentLoggedInUser);
             }
-            else if (choice == 3) {
+            else if (choice == 3) 
+            {
                 cout << "Logging out...\n";
                 currentLoggedInUser = ""; // Clear the logged-in user
             }
-            else {
+            else 
+            {
                 cout << "Invalid choice! Please try again.\n";
             }
         }
