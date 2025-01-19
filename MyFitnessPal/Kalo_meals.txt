@@ -1,6 +1,0 @@
-Date: 2025-01-18
-Food: Apple
-Calories: 30
-Date: 2025-01-18
-Food: Bread
-Calories: 140

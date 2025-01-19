@@ -604,6 +604,42 @@ void generateDailyReport(const string& username,const string& date)
     cout << "Caloric Balance: " << caloricBalanceToday << " kcal\n";
 }
 
+//Function that deletes data from a specific file of a specific date
+void deleteData(const string& username, const string& date, const string& fileType)
+{
+    string filename = username + "_" + fileType + ".txt";
+    ifstream inputfile(filename);
+    if (!inputfile.is_open())
+    {
+        cout << "Error opening the file!";
+        return;
+    }
+    vector<string> lines;
+    string line;
+    bool isTargetDate = false;
+    while (getline(inputfile, line))
+    {
+        if (line.find("Date: ") != string::npos)
+        {
+            if (line.substr(6) == date) isTargetDate = true;
+            else isTargetDate = false;
+        }
+        if (!isTargetDate) lines.push_back(line);
+    }
+    inputfile.close();
+    ofstream outputfile(filename);
+    if (!outputfile.is_open())
+    {
+        cout << "Error opening the file!";
+        return;
+    }
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        outputfile << lines[i] << "\n";
+    }
+    outputfile.close();
+}
+
 int main()
 {
     string username, password;
@@ -645,7 +681,8 @@ int main()
             cout << "4. Edit today's training sessions\n";
             cout << "5. View report for previous dates\n";
             cout << "6. View today's report\n";
-            cout << "7. Logout\n";
+            cout << "7. Delete data for specific date\n";
+            cout << "8. Logout\n";
             cout << "Enter your choice: ";
             cin >> choice;
 
@@ -673,7 +710,16 @@ int main()
             {
                 generateDailyReport(currentLoggedInUser, getCurrentDate());
             }
-            else if (choice == 7) 
+            else if (choice == 7)
+            {
+                cout << "Please type a date (YYYY-MM-DD Format): \n";
+                string date; 
+                cin >> date;
+                deleteData(currentLoggedInUser, date, "meals");
+                deleteData(currentLoggedInUser, date, "training");
+                cout << "Data for date: " << date << " has been deleted!";
+            }
+            else if (choice == 8) 
             {
                 cout << "Logging out...\n";
                 currentLoggedInUser = ""; // Clear the logged-in user
