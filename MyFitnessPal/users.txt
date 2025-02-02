@@ -18,3 +18,23 @@ Activity Level: low
 Goal: cutting
 Account Type: Premium
 -----------------------------
+Username: Ui
+Password: 123
+Age: 15
+Gender: m
+Height: 178 cm
+Weight: 78 kg
+Activity Level: low
+Goal: cutting
+Account Type: Premium
+-----------------------------
+Username: Tui
+Password: 1234
+Age: 16
+Gender: m
+Height: 167 cm
+Weight: 67 kg
+Activity Level: moderate
+Goal: gaining
+Account Type: Standart
+-----------------------------

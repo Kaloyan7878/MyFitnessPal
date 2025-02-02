@@ -32,7 +32,7 @@ struct Training
     string type;
     float calories;
 };
-//Function that shos the current date in the corrent format
+//Function that shows the current date in the corrent format
 string getCurrentDate()
 {
     time_t now = time(0);
@@ -335,15 +335,13 @@ void registerUser()
     cin >> user.activityLevel;
     cout << "Enter goal (cutting/maintaining/gaining): ";
     cin >> user.goal;
-    do 
+    for (;;)
     {
         cout << "Enter account type (Standard/Premium): ";
         cin >> user.accountType;
-        if (user.accountType != "Standard" || user.accountType != "Premium") 
-        {
-            cout << "Error, enter 'Standard' or 'Premium'." << endl;
-        }
-    } while (user.accountType != "Standard" || user.accountType != "Premium");
+        if (user.accountType == "Standart" || user.accountType == "Premium") break;
+        else cout<<"Wrong input!";
+    }
     ofstream file("users.txt", ios::app);
     if (file.is_open()) 
     {
