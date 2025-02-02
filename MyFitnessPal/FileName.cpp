@@ -637,7 +637,66 @@ void deleteData(const string& username, const string& date, const string& fileTy
     }
     outputfile.close();
 }
+void updateData(const string& username)
+{
+    User user = extractUserData(username);
+    cout << "\n--- Update Your Data ---\n";
+    cout << "Current age: " << user.age << ". Enter new age (0 to keep current): ";
+    unsigned newAge;
+    cin >> newAge;
+    if (newAge != 0) user.age = newAge;
+    cout << "Current height: " << user.height << " cm. Enter new height (0 to keep current): ";
+    float newHeight;
+    cin >> newHeight;
+    if (newHeight != 0) user.height = newHeight;
+    cout << "Current weight: " << user.weight << " kg. Enter new weight (0 to keep current): ";
+    float newWeight;
+    cin >> newWeight;
+    if (newWeight != 0) user.weight = newWeight;
+    cout << "Current activity level: " << user.activityLevel << ". Enter new activity level (low/moderate/high/very high) (leave empty to keep current): ";
+    string newActivityLevel;
+    cin >> newActivityLevel;
+    if (!newActivityLevel.empty()) user.activityLevel = newActivityLevel;
+    cout << "Current goal: " << user.goal << ". Enter new goal (cutting/maintaining/gaining) (leave empty to keep current): ";
+    string newGoal;
+    cin >> newGoal;
+    if (!newGoal.empty()) user.goal = newGoal;
+    user.maintenanceCalories = recommendedCalories(user);
 
+    ifstream file("users.txt");
+    ofstream tempFile("temp.txt");
+    string line;
+    while (getline(file, line))
+    {
+        if (line.find("Username: " + username) != string::npos)
+        {
+            tempFile << "Username: " << user.username << endl;
+            tempFile << "Password: " << user.password << endl;
+            tempFile << "Age: " << user.age << endl;
+            tempFile << "Gender: " << user.gender << endl;
+            tempFile << "Height: " << user.height << " cm" << endl;
+            tempFile << "Weight: " << user.weight << " kg" << endl;
+            tempFile << "Activity Level: " << user.activityLevel << endl;
+            tempFile << "Goal: " << user.goal << endl;
+            tempFile << "Account Type: " << user.accountType << endl;
+            //tempFile << "-----------------------------" << endl;
+            for (int i = 0; i < 8; i++)
+            {
+                getline(file, line);
+            }
+        }
+        else tempFile << line << endl;
+    }
+    file.close();
+    tempFile.close();
+    remove("users.txt");
+    rename("temp.txt", "users.txt");
+}
+
+bool checkIfDigit(char ch)
+{
+    return (ch >= '0' && ch <= '9');
+}
 int main()
 {
     string username, password;
@@ -658,7 +717,8 @@ int main()
         else if (choice == 2) 
         {
             loginUser();
-            displayUserData(currentLoggedInUser);
+            if (!currentLoggedInUser.empty()) displayUserData(currentLoggedInUser);
+            else cout << "Login failed!";
         }
         else if (choice == 3) 
         {
@@ -680,7 +740,8 @@ int main()
             cout << "5. View report for previous dates\n";
             cout << "6. View today's report\n";
             cout << "7. Delete data for specific date\n";
-            cout << "8. Logout\n";
+            cout << "8. Update data\n";
+            cout << "9. Logout\n";
             cout << "Enter your choice: ";
             cin >> choice;
 
@@ -719,8 +780,13 @@ int main()
             }
             else if (choice == 8) 
             {
+                updateData(currentLoggedInUser);
+            }
+            else if (choice == 9)
+            {
                 cout << "Logging out...\n";
-                currentLoggedInUser = ""; // Clear the logged-in user
+                currentLoggedInUser = "";
+                break;
             }
             else 
             {

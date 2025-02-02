@@ -1,10 +1,10 @@
 Username: Kalo
 Password: 123
-Age: 18
+Age: 20
 Gender: m
-Height: 187 cm
-Weight: 78 kg
-Activity Level: low
+Height: 190 cm
+Weight: 88 kg
+Activity Level: high
 Goal: cutting
 Account Type: Premium
 -----------------------------
