@@ -38,3 +38,33 @@ Activity Level: moderate
 Goal: gaining
 Account Type: Standart
 -----------------------------
+Username: Hana
+Password: 567
+Age: 14
+Gender: m
+Height: 178 cm
+Weight: 78 kg
+Activity Level: very high
+Goal: gaining
+Account Type: Standart
+-----------------------------
+Username: Red
+Password: 123
+Age: 13
+Gender: f
+Height: 15 cm
+Weight: 56 kg
+Activity Level: very high
+Goal: cutting
+Account Type: Standard
+-----------------------------
+Username: Blue
+Password: 1234
+Age: 16
+Gender: m
+Height: 167 cm
+Weight: 150 kg
+Activity Level: high
+Goal: cutting
+Account Type: Standard
+-----------------------------

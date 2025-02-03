@@ -128,7 +128,7 @@ void saveTrainingToFile(const string& username, const vector<Training>& training
     }
     file.close();
 }
-
+//Function that adds meal to the text file
 void addMeal(const string& username) 
 {
     Meal meal;
@@ -155,11 +155,12 @@ void addMeal(const string& username)
         cout << "Error opening the file!\n";
     }
 }
-
+//Function that allows us to edit the meals for a specific date
 void editMeals(const string& username, const string& date) {
     vector<Meal> meals = extractMealsForDate(username, date);
     cout << "\n--- Meals for " << date << " ---\n";
-    for (size_t i = 0; i < meals.size(); i++) {
+    for (size_t i = 0; i < meals.size(); i++) 
+    {
         cout << i + 1 << ". Food: " << meals[i].food << ", Calories: " << meals[i].calories << endl;
     }
     int choice;
@@ -242,22 +243,18 @@ void addTraining(const string& username)
 User users[100];
 int userCount = 0;
 string currentLoggedInUser = "";
-
+ 
 User extractUserData(const string& username) 
 {
     ifstream file("users.txt");
     string line;
     User user;
     bool found = false;
-
-    // Read the file line by line to find the user's data
     while (getline(file, line)) 
     {
         if (line.find("Username: " + username) != string::npos) 
         {
             user.username = username;
-
-            // Extract remaining data from the file
             for (int i = 0; i < 8; ++i) 
             {
                 getline(file, line);
@@ -270,9 +267,8 @@ User extractUserData(const string& username)
                 if (i == 6) user.goal = line.substr(line.find(": ") + 2);
                 if (i == 7) user.accountType = line.substr(line.find(": ") + 2);
             }
-
             found = true;
-            break;  // Exit the loop once the user is found
+            break;
         }
     }
     file.close();
@@ -280,8 +276,7 @@ User extractUserData(const string& username)
     {
         cout << "User not found in the file!" << endl;
     }
-
-    return user;  // Return the populated User object
+    return user;
 }
 // Function to check if the username is unique:
 bool isUsernameFree(string username)
@@ -332,14 +327,15 @@ void registerUser()
     cout << "Enter weight (kg): ";
     cin >> user.weight;
     cout << "Enter activity level (low/moderate/high/very high): ";
-    cin >> user.activityLevel;
+    cin.ignore();
+    getline(cin, user.activityLevel);
     cout << "Enter goal (cutting/maintaining/gaining): ";
     cin >> user.goal;
     for (;;)
     {
         cout << "Enter account type (Standard/Premium): ";
         cin >> user.accountType;
-        if (user.accountType == "Standart" || user.accountType == "Premium") break;
+        if (user.accountType == "Standard" || user.accountType == "Premium") break;
         else cout<<"Wrong input!";
     }
     ofstream file("users.txt", ios::app);
@@ -408,26 +404,26 @@ unsigned recommendedCalories(const User& user)
     {
         bmr = 447.593 + (9.247 * user.weight) + (3.098 * user.height) - (4.330 * user.age);
     }
-    float activityCoefficient = 1.2; // Default: sedentary
+    float activityCoefficient = 1.2;
     if (user.activityLevel == "low")
     {
-        activityCoefficient = 1.375; // Light activity (1-3 days per week)
+        activityCoefficient = 1.375;
     }
     else if (user.activityLevel == "moderate")
     {
-        activityCoefficient = 1.55; // Moderate activity (3-5 days per week)
+        activityCoefficient = 1.55;
     }
-    else if (user.activityLevel == "active")
+    else if (user.activityLevel == "high")
     {
-        activityCoefficient = 1.725; // Active work (6-7 days per week)
+        activityCoefficient = 1.725;
     }
-    else if (user.activityLevel == "very active")
+    else if (user.activityLevel == "very high")
     {
-        activityCoefficient = 1.9; // Very active (intense physical activity)
+        activityCoefficient = 1.9;
     }
     else
     {
-        cout << "Invalid activity level. Defaulting to sedentary." << endl;
+        cout << "Invalid activity level. Defaulting" << endl;
     }
     float maintenanceCalories = bmr * activityCoefficient;
     if (user.goal == "cutting") return maintenanceCalories - 550;
@@ -542,6 +538,10 @@ void calculateMacros(const User& user)
 void displayUserData(const string& username) 
 {
     User user = extractUserData(username);  // Get user data from file
+    vector<Meal> meals;
+    vector<Training> trainings;
+    saveMealsToFile(username, meals);
+    saveTrainingToFile(username,trainings);
     if (user.username.empty()) 
     {
         return;  // If the username was not found, exit the function
@@ -558,7 +558,6 @@ void displayUserData(const string& username)
     // Calculate and display the recommended daily calories
     float recommendedCal = recommendedCalories(user);
     cout << "Recommended daily calories: " << recommendedCal << " kcal" << endl;
-    cout << "Balance: " << caloricBalance(username,getCurrentDate()) << endl;
     if (user.accountType == "Premium") calculateMacros(user);
 }
 void generateDailyReport(const string& username,const string& date)
@@ -693,10 +692,6 @@ void updateData(const string& username)
     rename("temp.txt", "users.txt");
 }
 
-bool checkIfDigit(char ch)
-{
-    return (ch >= '0' && ch <= '9');
-}
 int main()
 {
     string username, password;
@@ -793,5 +788,5 @@ int main()
                 cout << "Invalid choice! Please try again.\n";
             }
         }
-    } while (true); // Keeps returning to the main menu until the user exits
+    } while (true);
 }
